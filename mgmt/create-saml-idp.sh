@@ -33,6 +33,12 @@ if [[ -z "$origin_name" ]]; then
     echo "You must specify the origin name with option -n."
     exit 1
 fi
+echo $origin_name | grep ^.*[\]\^\:\ \?\/\@\#\[\{\}\!\$\&\'\(\)\*\+\,\;\=\~\`\%\|\<\>\"].*$
+#A status code of 0 means that there was a special character in the origin name.
+if [ $? == 0 ]; then
+    echo "Origin name $origin_name contains special characters. Remove the special characters and retry."
+    exit 1
+fi   
 
 if [[ -z "$saml_metadata_file" ]]; then
     echo "You must specify the idp config file with option -m."
