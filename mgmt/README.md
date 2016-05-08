@@ -2,10 +2,10 @@
 SAML federation is not simple protocol to understand or implement. Hopefully below description will help you understand what needs to configured for your application and how to achieve it using set of helpful scripts.
 
 First, lets try to understand what SAML federation needed if any and how it needs to be configured. Here few pointers that may help you.
-1. If your users accounts adminitered locally in UAA using UAA SCIM api's or UAA dashboard, no SAML federation needed. Just scip below section.
-2. If user accounts provisioned remotely on external Identity Provider (IdP) like GE SSO for example UAA become Service Provider in SAML that redirects to external Identity Provider (IdP). In this case please follw section 'Configuring UAA as Service Provider (SP)'.
-3. If you have application that capable to participate in SAML flow as SAML Service Provider (SP) like GitHub Enterprise or ServiceNow please follow section 'Configuring UAA as Identity Provider (IdP)'.
-4. For testing porposes it is possible to configure UAA as both Service Provider (SP) and Identity Provider (IdP). In this rare case you need to follow both sections.      
+* If your users accounts adminitered locally in UAA using UAA SCIM api's or UAA dashboard, no SAML federation needed. Just scip below section.
+* If user accounts provisioned remotely on external Identity Provider (IdP) like GE SSO for example UAA become Service Provider in SAML that redirects to external Identity Provider (IdP). In this case please follw section 'Configuring UAA as Service Provider (SP)'.
+* If you have application that capable to participate in SAML flow as SAML Service Provider (SP) like GitHub Enterprise or ServiceNow please follow section 'Configuring UAA as Identity Provider (IdP)'.
+* For testing porposes it is possible to configure UAA as both Service Provider (SP) and Identity Provider (IdP). In this rare case you need to follow both sections.      
 
 # Configuring UAA as Identity Provider (IdP) 
 
