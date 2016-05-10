@@ -1,13 +1,16 @@
 #!/bin/bash
 set -v -x
 
-while getopts ":n:m:i" opt; do
+while getopts ":n:m:s:i" opt; do
     case $opt in
-	n)
-	    origin_name=$OPTARG
-	    ;;
+    n)
+        origin_name=$OPTARG
+        ;;
         m)
             saml_metadata_file=$OPTARG
+            ;;
+        s)
+            sp_entity_id=$OPTARG
             ;;
         i)
             skip_ssl="true"
@@ -24,7 +27,11 @@ while getopts ":n:m:i" opt; do
 done
 
 if [[ -z "$origin_name" ]]; then
-    echo "You must specify the origin name with option -n."
+    echo "You must specify the service provider name with option -n."
+    exit 1
+fi
+if [[ -z "$sp_entity_id" ]]; then
+    echo "You must specify the service provider entity id with option -s."
     exit 1
 fi
 echo $origin_name | grep ^.*[\]\^\:\ \?\/\@\#\[\{\}\!\$\&\'\(\)\*\+\,\;\=\~\`\%\|\<\>\"].*$
@@ -40,7 +47,7 @@ if [[ -z "$saml_metadata_file" ]]; then
 fi
 
 left='{"metaDataLocation":"'
-right='","spEntityId":"'"$origin_name"'","nameID":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","singleSignOnServiceIndex":0,"metadataTrustCheck":false,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory"}'
+right='","nameID":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","singleSignOnServiceIndex":0,"metadataTrustCheck":false}'
 
 
 esc_left=$(echo $left | sed 's/"/\\"/g')
@@ -55,7 +62,7 @@ esc_middle_2=$(echo "$esc_middle_1" | sed 's/"/\\\\\\"/g')
 
 config="$esc_left$esc_middle_2$esc_right"
 
-data='{"entityId":"'"$origin_name"'","name":"'"$origin_name"'","config":"'"$config"'","active":true}'
+data='{"entityId":"'"$sp_entity_id"'","name":"'"$origin_name"'","config":"'"$config"'","active":true}'
 
 if [[ -z $skip_ssl ]]; then
     uaac curl -XPOST -H"Accept:application/json" -H"Content-Type:application/json" /saml/service-providers -d "$data"

@@ -38,11 +38,13 @@ uaac target <UAA_IDP_INSTANCE_URL>
 uaac token authcode get
 Client name:  identity
 Client secret:  <identity client secret>
-(Should be redirected to UAA IdP login page.  Enter credentials for user provisioned in step 5 above.)
-Successfully fetched token via authorization code grant
-
-./create-saml-sp.sh -n <uaa-sp-name> -m sp-metadata.xml -i
 ```
+You should be redirected to UAA IdP login page.  Enter credentials for user provisioned in step 5 above and verify that response is "Successfully fetched token via authorization code grant"
+```code
+./create-saml-sp.sh -n <your-sp-name> -m sp-metadata.xml -s <your-sp-entity-id> -i
+```
+your-sp-name is a user friendly name for your service provider.  It could be any arbitrary string without special characters
+your-sp-entity-id should match service provider entityID in its metadata.
 ##### 7. Check if your SP configuration was succesfully added
 ```code
 uaac curl /saml/service-providers
