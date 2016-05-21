@@ -21,9 +21,9 @@ while getopts ":n:m:t:ad:c:g:" opt; do
         c)
             config_mapping_file=$OPTARG
             ;;
-	 g)
+	g)
 	    groups_mapping_file=$OPTARG
-	    ;;	
+	    ;;
 	\?)
 	    echo "Invalid option: -$OPTARG" >&2
 	    exit 1
