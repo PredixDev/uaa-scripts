@@ -74,22 +74,63 @@ Follow up instructions assume that after configuring UAA SP in your Identity Pro
 uaac target <UAA_SP_INSTANCE_URL>
 uaac token client get admin
 Client secret: <admin client secret>
-./create-saml-idp.sh -n <uaa-idp-name> -m idp-metadata.xml -a
+./create-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -a -c <mapping-config-file> -g <groups-config-file>
 ```
+your-idp-name is a user friendly name for your identity provider.  It could be any arbitrary string without special characters
+
+`a` option makes sure that shadow accounts created authomatically after successful login
+
+`c` is optional parameter if any attribute mapping is requred to convert SAML assertion attributes to JWT token.
+
+Example of attribute mapping configuration file would be following:
+```code
+{
+ "email":"mail",
+ "given_name":"first name",
+ "family_name":"last name"
+ }
+```
+
+`g` is optional parameter if any groups needs to be mapped from external IdP.
+Example of groups array configuration file would be following:
+```code
+[
+"group1",
+"group2",
+"group3",
+"group4",
+"group5"
+]
+```
+
 ##### 3. Check that the IdP configuration was succesfully added 
 ```code
 uaac curl /identity-providers
 ```
 Output of this command should show default UAA zone configuration as well as any IdP configured in prior steps.
-##### 4. Provision a client for your IdP. Client should be configured with IdP as the allowed provider.
+
+##### 4. Optional Step if IdP configuration above needs to be updated
+If you didn't set up identity provider up front and you need to change some IdP configuration after it was initially provisioned you can use following update script:
+
+```code
+uaac target <UAA_SP_INSTANCE_URL>
+uaac token client get admin
+Client secret: <admin client secret>
+./update-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -d <idp-id> -a -c <mapping-config-file> -g <groups-config-file>
+```
+your-idp-name is a name of identoty provider that you set up during create step and corresponds to "name" attribute for /identity-providers payload
+idp-id is auto generated id from UAA and corresponds to "id" attribute for /identity-providers payload
+For a meanings of `a`, `c` and `g options please see above in create-saml-idp.sh script section.
+
+##### 5. Provision a client for your IdP. Client should be configured with IdP as the allowed provider.
 ```code
 ./create-client-for-idp.sh -c <client-id> -s <client-secret> -p <your-idp-name> -r <redirect_uri>
 ```
-##### 5. Validate that client created and allowed providers attribute is set to your IdP.
+##### 6. Validate that client created and allowed providers attribute is set to your IdP.
 ```code
 uaac client get <client-id>
 ```
-##### 6. To test the setup, navigate to the following URL:
+##### 7. To test the setup, navigate to the following URL:
 ```code
 <UAA_SP_INSTANCE_URL>/oauth/authorize?client_id=<client-id>&response_type=code&redirect_uri=<redirect_uri>
 ```

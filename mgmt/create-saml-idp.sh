@@ -1,7 +1,7 @@
 #!/bin/bash
 set -v -x
 
-while getopts ":n:m:t:ai" opt; do
+while getopts ":n:m:t:c:g:ai" opt; do
     case $opt in
 	n)
 	    origin_name=$OPTARG
@@ -17,6 +17,12 @@ while getopts ":n:m:t:ai" opt; do
             ;;
         i)
             skip_ssl="true"
+            ;;
+        c)
+            config_mapping_file=$OPTARG
+            ;;
+        g)
+            groups_mapping_file=$OPTARG
             ;;
 	\?)
 	    echo "Invalid option: -$OPTARG" >&2
@@ -45,6 +51,18 @@ if [[ -z "$saml_metadata_file" ]]; then
     exit 1
 fi
 
+if [[ -z "$config_mapping_file" ]]; then
+    config_mapping="{}"
+else
+	config_mapping=$(cat "$config_mapping_file" | col -b)
+fi
+
+if [[ -z "$groups_mapping_file" ]]; then
+    groups_list="[]"
+else
+	groups_list=$(cat "$groups_mapping_file" | col -b)
+fi
+
 if [[ -z "$link_text" ]]; then
     link_text="SAML SSO"
 fi
@@ -54,8 +72,7 @@ if [[ -z "$add_shadow_user_on_login" ]]; then
 fi
 
 left='{"metaDataLocation":"'
-right='","idpEntityAlias":"'"$origin_name"'","nameID":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":'"$add_shadow_user_on_login"'}'
-
+right='","idpEntityAlias":"'"$origin_name"'","nameID":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
 
 esc_left=$(echo $left | sed 's/"/\\"/g')
 esc_right=$(echo $right | sed 's/"/\\"/g')
