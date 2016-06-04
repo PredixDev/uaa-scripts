@@ -1,11 +1,11 @@
 # UAA Secure Assertion Markup Language (SAML) Federation overview
-SAML federation is not simple protocol to understand or implement. Hopefully below description will help you understand what needs to configured for your application and how to achieve it using set of helpful scripts.
+SAML federation is a complex protocol to understand and implement. The description in this readme will guide you through the process of configuring UAA and your application using a set of helpful scripts.
 
-First, lets try to understand what SAML federation needed if any and how it needs to be configured. Here few pointers that may help you.
-* If your users accounts adminitered locally in UAA using UAA SCIM api's or UAA dashboard, no SAML federation needed. Just scip below section.
-* If user accounts provisioned remotely on external Identity Provider (IdP) like GE SSO for example UAA become Service Provider in SAML that redirects to external Identity Provider (IdP). In this case please follw section 'Configuring UAA as Service Provider (SP)'.
-* If you have application that capable to participate in SAML flow as SAML Service Provider (SP) like GitHub Enterprise or ServiceNow please follow section 'Configuring UAA as Identity Provider (IdP)'.
-* For testing porposes it is possible to configure UAA as both Service Provider (SP) and Identity Provider (IdP). In this rare case you need to follow both sections.      
+First, determine what SAML federation is required (if any) and how it can be configured.
+* You do not need to configure UAA for SAML federation if you administer users accounts locally in UAA using UAA SCIM APIs or UAA dashboard.
+* If you provision your user accounts remotely on an external IdP such as Company SSO, you can configure UAA as SP that redirects to external IdP. For more information, see section 'Configuring UAA as Service Provider (SP)'.
+* If you have applications that provide SP capability (For example, GitHub Enterprise or ServiceNow), you can configure UAA as IdP. For more information, see section 'Configuring UAA as Identity Provider (IdP)'.
+* It is possible to configure UAA as both SP and IdP. However such a configuration is useful only as a test environment. To set up UAA as SP and IdP, you can complete steps for configuring UAA as both SP and IdP.      
 
 # Configuring UAA as Identity Provider (IdP) 
 
@@ -45,7 +45,7 @@ You should be redirected to UAA IdP login page.  Enter credentials for user prov
 ```
 your-sp-name is a user friendly name for your service provider.  It could be any arbitrary string without special characters
 your-sp-entity-id should match service provider entityID in its metadata.
-##### 7. Check if your SP configuration was succesfully added
+##### 7. Check if your SP configuration was succesfully added:
 ```code
 uaac curl /saml/service-providers
 ```
@@ -65,7 +65,7 @@ cd uaa-scripts/mgmt
 Every Identity Provider may have different instructions how to import SAML metadata. As result we cannot provide direct instructions here.
 ##### 4. Obtain your IdP SAML metadata from your IdP administrator.
 Follow up instructions assume that after configuring UAA SP in your Identity Provider, IdP SAML metadata is stored into file: idp-metadata.xml
-##### 5. Validate the SAML Identity Provider metadata is properly formatted by running through a XML parser. Ensure that it contains a valid XML header such as:
+##### 5. Validate the SAML Identity Provider metadata is properly formatted by running through an XML parser. Ensure that it contains a valid XML header such as:
 ```code
 <?xml version="1.0" encoding="UTF-8"?>
 ```
@@ -78,11 +78,11 @@ Client secret: <admin client secret>
 ```
 your-idp-name is a user friendly name for your identity provider.  It could be any arbitrary string without special characters
 
-`a` option makes sure that shadow accounts created authomatically after successful login
+`a` option specifies that a shadow user should be created in UAA. By default, a shadow user is not created.
 
-`c` is optional parameter if any attribute mapping is requred to convert SAML assertion attributes to JWT token.
+`c` is an optional parameter that specifies configuration mapping file. A configuration mapping file contains attribute mappings required to convert SAML assertion attributes to JWT token.
 
-Example of attribute mapping configuration file would be following:
+Example of an attribute mapping configuration file is as follows:
 ```code
 {
  "email":"mail",
@@ -91,8 +91,9 @@ Example of attribute mapping configuration file would be following:
  }
 ```
 
-`g` is optional parameter if any groups needs to be mapped from external IdP.
-Example of groups array configuration file would be following:
+`g` is an optional parameter that specifies groups configuration file. A groups configuration file contains any groups that need to be mapped from external IdP.
+
+Example of a groups configuration file is as follows:
 ```code
 [
 "group1",
@@ -109,8 +110,8 @@ uaac curl /identity-providers
 ```
 Output of this command should show default UAA zone configuration as well as any IdP configured in prior steps.
 
-##### 4. Optional Step if IdP configuration above needs to be updated
-If you didn't set up identity provider up front and you need to change some IdP configuration after it was initially provisioned you can use following update script:
+##### 4. (Optional) If you need to update the existing IdP configuration
+If you didn't set up identity provider up front and you need to change some IdP configuration after it was initially provisioned, you can use the following update script:
 
 ```code
 uaac target <UAA_SP_INSTANCE_URL>
@@ -134,10 +135,10 @@ uaac client get <client-id>
 ```code
 <UAA_SP_INSTANCE_URL>/oauth/authorize?client_id=<client-id>&response_type=code&redirect_uri=<redirect_uri>
 ```
-client-id - name iof the client provisioned in the step 5 above
-redirect_uri - application URL, i.e., https://security-predix-seed.grc-apps.svc.ice.ge.com
-Above request should be redirected to your IdP login page.  Enter credentials for user provisioned for your IdP.  If succesfull, should redirect back to redirect_uri.
-For validation SAML flow we recommend using browser plugin tools like 'SAML tracer' for Firefox.
+client-id - name iof the client provisioned in the step 5 above 
+redirect_uri - URL encoded application URL, i.e., https%3A%2F%2Fsecurity-predix-seed.grc-apps.svc.ice.ge.com
+This request should be redirected to your IdP login page.  Enter credentials for user provisioned for your IdP.  If successful, should redirect back to redirect_uri.
+For validation SAML flow, it is recommended to use browser plugin tools like 'SAML tracer' for Firefox.
 
 
 
