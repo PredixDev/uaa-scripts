@@ -136,7 +136,7 @@ For a meanings of `a`, `c`, `g` and `h` options please see above in create-saml-
 ```code
 ./create-client-for-idp.sh -c <client-id> -s <client-secret> -p <idp_array_file> -r <redirect_uri>
 ```
-Example of a IdP array file is as follows: where "gesso" could be the <your-idp-name> above in Add your IdP configuration.
+Example of a IdP array file is as follows: where "gesso" could be the `your-idp-name` above in Add your IdP configuration.
 ```code
 [
 "gesso",
