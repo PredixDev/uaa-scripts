@@ -74,7 +74,7 @@ Follow up instructions assume that after configuring UAA SP in your Identity Pro
 uaac target <UAA_SP_INSTANCE_URL>
 uaac token client get admin
 Client secret: <admin client secret>
-./create-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -a -c <mapping-config-file> -g <groups-config-file>
+./create-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -a -c <mapping-config-file> -g <groups-config-file> -h <config_email_domain_file>
 ```
 your-idp-name is a user friendly name for your identity provider.  It could be any arbitrary string without special characters
 
@@ -103,7 +103,16 @@ Example of a groups configuration file is as follows:
 "group5"
 ]
 ```
-
+`h` is an optional parameter that specifies email domains that the IdP can authenticate, this is used for the saml idp discovery profile.
+ Example of a email domains configuration file is as follows:
+ ```code
+ [
+ "ge.com",
+ "example.org",
+ "subexample.example.com",
+ "digital.gov"
+ ]
+```
 ##### 3. Check that the IdP configuration was succesfully added 
 ```code
 uaac curl /identity-providers
@@ -117,21 +126,34 @@ If you didn't set up identity provider up front and you need to change some IdP 
 uaac target <UAA_SP_INSTANCE_URL>
 uaac token client get admin
 Client secret: <admin client secret>
-./update-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -d <idp-id> -a -c <mapping-config-file> -g <groups-config-file>
+./update-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -d <idp-id> -a -c <mapping-config-file> -g <groups-config-file> -h <config_email_domain_file>
 ```
 your-idp-name is a name of identoty provider that you set up during create step and corresponds to "name" attribute for /identity-providers payload
 idp-id is auto generated id from UAA and corresponds to "id" attribute for /identity-providers payload
-For a meanings of `a`, `c` and `g options please see above in create-saml-idp.sh script section.
+For a meanings of `a`, `c`, `g` and `h` options please see above in create-saml-idp.sh script section.
 
-##### 5. Provision a client for your IdP. Client should be configured with IdP as the allowed provider.
+##### 5. Provision a client for your IdP(s). Client should be configured with IdP(s) as the allowed provider.
 ```code
-./create-client-for-idp.sh -c <client-id> -s <client-secret> -p <your-idp-name> -r <redirect_uri>
+./create-client-for-idp.sh -c <client-id> -s <client-secret> -p <idp_array_file> -r <redirect_uri>
 ```
-##### 6. Validate that client created and allowed providers attribute is set to your IdP.
+Example of a IdP array file is as follows:
+```code
+[
+"gesso",
+"example-sso",
+"saml-gov-sso",
+]
+```
+##### 6. Validate that client created and allowed providers attribute is set to your IdP list.
 ```code
 uaac client get <client-id>
 ```
-##### 7. To test the setup, navigate to the following URL:
+##### 7. (Optional) If you need to update the existing client for your IdP(s).
+```code
+./update-client-for-idp.sh -c <client-id> -s <client-secret> -p <idp_array_file> -r <redirect_uri>
+```
+For example of a IdP array file, please see the above Provision a client for your IdP.
+##### 8. To test the setup, navigate to the following URL:
 ```code
 <UAA_SP_INSTANCE_URL>/oauth/authorize?client_id=<client-id>&response_type=code&redirect_uri=<redirect_uri>
 ```
