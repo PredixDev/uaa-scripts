@@ -1,7 +1,7 @@
 #!/bin/bash
 set -v -x
 
-while getopts ":n:m:t:ad:c:g:" opt; do
+while getopts ":n:m:t:d:c:g:h:a" opt; do
     case $opt in
 	n)
 	    origin_name=$OPTARG
@@ -23,6 +23,9 @@ while getopts ":n:m:t:ad:c:g:" opt; do
             ;;
 	g)
 	    groups_mapping_file=$OPTARG
+	    ;;
+	h)
+	    config_email_domain_file=$OPTARG
 	    ;;
 	\?)
 	    echo "Invalid option: -$OPTARG" >&2
@@ -72,12 +75,19 @@ else
 	groups_list=$(cat "$groups_mapping_file" | col -b)
 fi
 
+if [[ -z "$config_email_domain_file" ]]; then
+    config_email_domain_file="[]"
+else
+    config_email_domain_file=$(cat "$config_email_domain_file" | col -b)
+fi
+
 if [[ -z "$add_shadow_user_on_login" ]]; then
     add_shadow_user_on_login="false"
 fi
 
 left='{"metaDataLocation":"'
-right='","idpEntityAlias":"'"$origin_name"'","nameID":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
+right='","emailDomain":'"$config_email_domain_file"',"idpEntityAlias":"'"$origin_name"'","nameID":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
+
 
 
 esc_left=$(echo $left | sed 's/"/\\"/g')
