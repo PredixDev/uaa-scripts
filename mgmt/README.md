@@ -152,7 +152,7 @@ uaac client get <client-id>
 ```code
 ./update-client-for-idp.sh -c <client-id> -s <client-secret> -p <idp_array_file> -r <redirect_uri>
 ```
-For example of a IdP array file, please see the above Provision a client for your IdP.
+For meaning of IdP array file, please see the above Provision a client for your IdP.
 ##### 8. To test the setup, navigate to the following URL:
 ```code
 <UAA_SP_INSTANCE_URL>/oauth/authorize?client_id=<client-id>&response_type=code&redirect_uri=<redirect_uri>
