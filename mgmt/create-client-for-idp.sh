@@ -13,7 +13,7 @@ while getopts ":c:s:r:p:i" opt; do
             redirect_uri=$OPTARG
             ;;
         p)
-            idp_array_file=$OPTARG
+            idps=$OPTARG
             ;;
         i)
             skip_ssl="true"
@@ -39,19 +39,31 @@ if [[ -z "$client_secret" ]]; then
     exit 1
 fi
 
-if [[ -z "$idp_array_file" ]]; then
-    echo "You must specify the identity providers array with option -p."
+if [[ -z "$idps" ]]; then
+    echo "You must specify the allowed identity providers comma separated list with option -p,"
+    echo "And at least one identity provider must be input with option -p."
     exit 1
 fi
 
-idp_array_file=$(cat "$idp_array_file" | col -b)  
+
+echo "$idps"
+
+IFS=',' read -ra allowed_providers <<< "$idps"
+echo "${allowed_providers[@]}"
+comma=","
+for i in "${allowed_providers[@]}"; do
+    idp_array="$idp_array\"$i\"$comma"
+done
+
+idp_array=$(echo "${idp_array%?}")
+echo "$idp_array"
 
 if [[ -z "$redirect_uri" ]]; then
     echo "You must specify a redirect URI with option -r."
     exit 1
 fi
 
-payload='{ "client_id" : "'"$client_id"'", "client_secret" : "'"$client_secret"'", "authorized_grant_types" : ["authorization_code"], "scope" : ["openid"], "autoapprove":["openid"], "authorities":["uaa.resource"], "resource_ids":["none"], "redirect_uri":["'$redirect_uri'"], "allowedproviders" : '"$idp_array_file"'}'
+payload='{ "client_id" : "'"$client_id"'", "client_secret" : "'"$client_secret"'", "authorized_grant_types" : ["authorization_code"], "scope" : ["openid"], "autoapprove":["openid"], "authorities":["uaa.resource"], "resource_ids":["none"], "redirect_uri":["'$redirect_uri'"], "allowedproviders" : ['"$idp_array"']}'
 
 if [[ -z $skip_ssl ]]; then
     uaac curl -XPOST -H "Accept: application/json" -H "Content-Type: application/json" -d "$payload" /oauth/clients
