@@ -134,23 +134,22 @@ For a meanings of `a`, `c`, `g` and `h` options please see above in create-saml-
 
 ##### 5. Provision a client for your IdP(s). Client should be configured with IdP(s) as the allowed provider.
 ```code
-./create-client-for-idp.sh -c <client-id> -s <client-secret> -p <idp_array_file> -r <redirect_uri>
+./create-client-for-idp.sh -c <client-id> -s <client-secret> -p <comma_separated_idp_list> -r <redirect_uri>
 ```
-Example of a IdP array file is as follows: where "gesso" could be the `<your-idp-name>` above in Add your IdP configuration.
+Examples of a comma separated idp list are:
 ```code
-[
-"gesso",
-"example-sso",
-"saml-gov-sso",
-]
+gesso,sfsso,us-sso
+gesso
+us-sso,gesso
 ```
+
 ##### 6. Validate that client created and allowed providers attribute is set to your IdP list.
 ```code
 uaac client get <client-id>
 ```
 ##### 7. (Optional) If you need to update the existing client for your IdP(s).
 ```code
-./update-client-for-idp.sh -c <client-id> -s <client-secret> -p <idp_array_file> -r <redirect_uri>
+./update-client-for-idp.sh -c <client-id> -s <client-secret> -p <comma_separated_idp_list> -r <redirect_uri>
 ```
 For meaning of IdP array file, please see the above Provision a client for your IdP.
 ##### 8. To test the setup, navigate to the following URL:
