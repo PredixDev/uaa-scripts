@@ -45,18 +45,18 @@ if [[ -z "$idps" ]]; then
     exit 1
 fi
 
-
 echo "$idps"
 
-IFS=',' read -ra allowed_providers <<< "$idps"
+IFS=',' read -ra allowed_providers <<< "$idps" 
 echo "${allowed_providers[@]}"
 comma=","
 for i in "${allowed_providers[@]}"; do
-    idp_array="$idp_array\"$i\"$comma"
+     idp_array="$idp_array\"$i\"$comma"
 done
 
 idp_array=$(echo "${idp_array%?}")
 echo "$idp_array"
+
 
 if [[ -z "$redirect_uri" ]]; then
     echo "You must specify a redirect URI with option -r."
@@ -66,7 +66,7 @@ fi
 payload='{ "client_id" : "'"$client_id"'", "client_secret" : "'"$client_secret"'", "authorized_grant_types" : ["authorization_code"], "scope" : ["openid"], "autoapprove":["openid"], "authorities":["uaa.resource"], "resource_ids":["none"], "redirect_uri":["'$redirect_uri'"], "allowedproviders" : ['"$idp_array"']}'
 
 if [[ -z $skip_ssl ]]; then
-    uaac curl -XPOST -H "Accept: application/json" -H "Content-Type: application/json" -d "$payload" /oauth/clients
+    uaac curl -XPUT -H "Accept: application/json" -H "Content-Type: application/json" -d "$payload" /oauth/clients/$client_id
 else
-    uaac curl -XPOST -H "Accept: application/json" -H "Content-Type: application/json" -d "$payload" /oauth/clients --insecure
+    uaac curl -XPUT -H "Accept: application/json" -H "Content-Type: application/json" -d "$payload" /oauth/clients/$client_id --insecure
 fi
