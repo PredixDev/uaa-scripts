@@ -23,7 +23,36 @@ Every Service Provider may have different instructions how to import SAML metada
 ##### 4. Obtain your SP SAML metadata from your SP administrator.
 Follow up instructions assume that after configuring UAA IdP in your Service Provider, SP SAML metadata is stored into file: sp-metadata.xml
 
-##### 5. Provision a user for UAA IdP:
+##### 5. Add your SP configuration to UAA IdP:
+Ensure that the UAA IdP admin has sps.read and sps.write authorities.
+```code
+uaac target <UAA_IDP_INSTANCE_URL>
+uaac token client get admin
+Client secret: <admin client secret>
+uaac token decode
+```
+
+To update the UAA IdP admin authorities:
+```code
+uaac client update admin --authorities "<existing-authorities> sps.read sps.write"
+uaac token client get admin
+Client secret: <admin client secret>
+uaac token decode
+```
+
+Create the SP in UAA IdP:
+your-sp-name is a user friendly name for your service provider.  It could be any arbitrary string without special characters
+your-sp-entity-id should match service provider entityID in its metadata.
+```code
+./create-saml-sp.sh -n <your-sp-name> -m sp-metadata.xml -s <your-sp-entity-id> -i
+```
+
+##### 6. Check if your SP configuration was succesfully added:
+```code
+uaac curl /saml/service-providers
+```
+
+##### 7. (Optional) Provision a user for UAA IdP:
 ```code
 uaac target <UAA_IDP_INSTANCE_URL>
 uaac token client get admin
@@ -32,23 +61,15 @@ uaac user add <user-name> --given_name <first-name> --family_name <last-name> --
 uaac group add zones.uaa.admin
 uaac member add zones.uaa.admin myuser
 ```
-##### 6. Add your SP configuration to UAA IdP:
+Example of authcode flow using UAA IdP:
 ```code
 uaac target <UAA_IDP_INSTANCE_URL>
 uaac token authcode get
 Client name:  identity
 Client secret:  <identity client secret>
 ```
-You should be redirected to UAA IdP login page.  Enter credentials for user provisioned in step 5 above and verify that response is "Successfully fetched token via authorization code grant"
-```code
-./create-saml-sp.sh -n <your-sp-name> -m sp-metadata.xml -s <your-sp-entity-id> -i
-```
-your-sp-name is a user friendly name for your service provider.  It could be any arbitrary string without special characters
-your-sp-entity-id should match service provider entityID in its metadata.
-##### 7. Check if your SP configuration was succesfully added:
-```code
-uaac curl /saml/service-providers
-```
+You should be redirected to UAA IdP login page.  Enter credentials for user provisioned above and verify that response is "Successfully fetched token via authorization code grant"
+
 
 # Configuring UAA as Service Provider (SP)
 
