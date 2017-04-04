@@ -1,11 +1,11 @@
 #!/bin/bash
 set -v -x
 
-while getopts ":n:m:t:c:g:h:ai" opt; do
+while getopts ":n:m:t:c:g:h:f:ais" opt; do
     case $opt in
-	n)
-	    origin_name=$OPTARG
-	    ;;
+	    n)
+	        origin_name=$OPTARG
+	        ;;
         m)
             saml_metadata_file=$OPTARG
             ;;
@@ -25,16 +25,22 @@ while getopts ":n:m:t:c:g:h:ai" opt; do
             groups_mapping_file=$OPTARG
             ;;
         h)
-	    config_email_domain_file=$OPTARG
-	    ;;
-	\?)
-	    echo "Invalid option: -$OPTARG" >&2
-	    exit 1
-	    ;;
-	:)
-	    echo "Option -$OPTARG requires an argument." >&2
-	    exit 1
-	    ;;
+	        config_email_domain_file=$OPTARG
+	        ;;
+        f)
+            nameid_format=$OPTARG
+            ;;
+        s)
+            skip_tidy="true"
+            ;;
+    	\?)
+    	    echo "Invalid option: -$OPTARG" >&2
+    	    exit 1
+    	    ;;
+    	:)
+    	    echo "Option -$OPTARG requires an argument." >&2
+    	    exit 1
+    	    ;;
     esac
 done
 
@@ -80,22 +86,32 @@ else
     config_email_domain_file=$(cat "$config_email_domain_file" | col -b)
 fi
 
+if [[ -z "$nameid_format" ]]; then
+    nameid_format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
+fi
 
 left='{"metaDataLocation":"'
-right='","emailDomain":'"$config_email_domain_file"',"idpEntityAlias":"'"$origin_name"'","nameID":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
+right='","emailDomain":'"$config_email_domain_file"',"idpEntityAlias":"'"$origin_name"'","nameID":"'"$nameid_format"'","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
 
 esc_left=$(echo $left | sed 's/"/\\"/g')
 esc_right=$(echo $right | sed 's/"/\\"/g')
 
-
 # dos2unix for stupid OSX that doesn't have dos2unix
 esc_middle_0=$(cat "$saml_metadata_file" | col -b)
+# formats the xml
+if [[ -z $skip_tidy ]]; then
+    esc_middle_1=$(echo "$esc_middle_0" | tidy -xml -i -)
+else
+    esc_middle_1=$esc_middle_0
+fi
+# Replaces all \ with \\\\
+esc_middle_2=$(echo "$esc_middle_1" | sed 's/\\/\\\\\\\\/g')
 # Replaces all newlines with \\n
-esc_middle_1=$(echo "$esc_middle_0" | awk '$1=$1' ORS='\\\\n')
+esc_middle_3=$(echo "$esc_middle_2" | awk '$1=$1' ORS='\\\\n')
 # Replaces all quotes with \\\"
-esc_middle_2=$(echo "$esc_middle_1" | sed 's/"/\\\\\\"/g')
+esc_middle_4=$(echo "$esc_middle_3" | sed 's/"/\\\\\\"/g')
 
-config="$esc_left$esc_middle_2$esc_right"
+config="$esc_left$esc_middle_4$esc_right"
 
 data='{"originKey":"'"$origin_name"'","name":"'"$origin_name"'","type":"saml","config":"'"$config"'","active":true}'
 echo "$data"

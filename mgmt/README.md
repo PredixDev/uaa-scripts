@@ -5,9 +5,9 @@ First, determine what SAML federation is required (if any) and how it can be con
 * You do not need to configure UAA for SAML federation if you administer users accounts locally in UAA using UAA SCIM APIs or UAA dashboard.
 * If you provision your user accounts remotely on an external IdP such as Company SSO, you can configure UAA as SP that redirects to external IdP. For more information, see section 'Configuring UAA as Service Provider (SP)'.
 * If you have applications that provide SP capability (For example, GitHub Enterprise or ServiceNow), you can configure UAA as IdP. For more information, see section 'Configuring UAA as Identity Provider (IdP)'.
-* It is possible to configure UAA as both SP and IdP. However such a configuration is useful only as a test environment. To set up UAA as SP and IdP, you can complete steps for configuring UAA as both SP and IdP.      
+* It is possible to configure UAA as both SP and IdP. However such a configuration is useful only as a test environment. To set up UAA as SP and IdP, you can complete steps for configuring UAA as both SP and IdP.
 
-# Configuring UAA as Identity Provider (IdP) 
+# Configuring UAA as Identity Provider (IdP)
 
 ##### 1.  Checkout scripts to manage UAA IdP:
 ```code
@@ -95,7 +95,7 @@ Follow up instructions assume that after configuring UAA SP in your Identity Pro
 uaac target <UAA_SP_INSTANCE_URL>
 uaac token client get admin
 Client secret: <admin client secret>
-./create-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -a -c <mapping-config-file> -g <groups-config-file> -h <config_email_domain_file>
+./create-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -a -c <mapping-config-file> -g <groups-config-file> -h <config_email_domain_file> -f <nameID> -s
 ```
 your-idp-name is a user friendly name for your identity provider.  It could be any arbitrary string without special characters
 
@@ -134,7 +134,21 @@ Example of a groups configuration file is as follows:
  "digital.gov"
  ]
 ```
-##### 3. Check that the IdP configuration was succesfully added 
+`f` is an optional string parameter that specifies the nameID to be used for the identity-provider config.nameID property.
+It could be any of the following permitted values:
+```
+urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName
+urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName
+urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos
+urn:oasis:names:tc:SAML:2.0:nameid-format:entity
+```
+`s` option specifies that the xml formatting be skipped. By Default, xml formatting is done with `tidy` command on bash.
+
+##### 3. Check that the IdP configuration was succesfully added
 ```code
 uaac curl /identity-providers
 ```
@@ -147,9 +161,9 @@ If you didn't set up identity provider up front and you need to change some IdP 
 uaac target <UAA_SP_INSTANCE_URL>
 uaac token client get admin
 Client secret: <admin client secret>
-./update-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -d <idp-id> -a -c <mapping-config-file> -g <groups-config-file> -h <config_email_domain_file>
+./update-saml-idp.sh -n <your-idp-name> -m idp-metadata.xml -d <idp-id> -a -c <mapping-config-file> -g <groups-config-file> -h <config_email_domain_file> -f <nameID> -s
 ```
-your-idp-name is a name of identoty provider that you set up during create step and corresponds to "name" attribute for /identity-providers payload
+your-idp-name is a name of identity provider that you set up during create step and corresponds to "name" attribute for /identity-providers payload
 idp-id is auto generated id from UAA and corresponds to "id" attribute for /identity-providers payload
 For a meanings of `a`, `c`, `g` and `h` options please see above in create-saml-idp.sh script section.
 
@@ -177,7 +191,7 @@ For meaning of IdP array file, please see the above Provision a client for your 
 ```code
 <UAA_SP_INSTANCE_URL>/oauth/authorize?client_id=<client-id>&response_type=code&redirect_uri=<redirect_uri>
 ```
-client-id - name iof the client provisioned in the step 5 above 
+client-id - name iof the client provisioned in the step 5 above
 redirect_uri - URL encoded application URL, i.e., https%3A%2F%2Fsecurity-predix-seed.grc-apps.svc.ice.ge.com
 This request should be redirected to your IdP login page.  Enter credentials for user provisioned for your IdP.  If successful, should redirect back to redirect_uri.
 For validation SAML flow, it is recommended to use browser plugin tools like 'SAML tracer' for Firefox.
