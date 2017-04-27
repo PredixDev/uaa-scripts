@@ -1,7 +1,7 @@
 #!/bin/bash
 set -v -x
 
-while getopts ":n:m:t:c:g:h:f:ais" opt; do
+while getopts ":n:m:t:c:g:h:f:airs" opt; do
     case $opt in
 	    n)
 	        origin_name=$OPTARG
@@ -18,6 +18,9 @@ while getopts ":n:m:t:c:g:h:f:ais" opt; do
         i)
             skip_ssl="true"
             ;;
+        r)
+            group_mapping_mode="AS_SCOPES"
+            ;;            
         c)
             config_mapping_file=$OPTARG
             ;;
@@ -90,8 +93,12 @@ if [[ -z "$nameid_format" ]]; then
     nameid_format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
 fi
 
+if [[ -z "$group_mapping_mode" ]]; then
+    group_mapping_mode="EXPLICITLY_MAPPED"
+fi
+
 left='{"metaDataLocation":"'
-right='","emailDomain":'"$config_email_domain_file"',"idpEntityAlias":"'"$origin_name"'","nameID":"'"$nameid_format"'","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
+right='","emailDomain":'"$config_email_domain_file"',"idpEntityAlias":"'"$origin_name"'","nameID":"'"$nameid_format"'","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"groupMappingMode":"'"$group_mapping_mode"'","addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
 
 esc_left=$(echo $left | sed 's/"/\\"/g')
 esc_right=$(echo $right | sed 's/"/\\"/g')
