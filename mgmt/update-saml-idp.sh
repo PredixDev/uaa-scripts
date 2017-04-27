@@ -1,7 +1,7 @@
 #!/bin/bash
 set -v -x
 
-while getopts ":n:m:t:d:c:g:h:f:as" opt; do
+while getopts ":n:m:t:d:c:g:h:f:airs" opt; do
     case $opt in
 	n)
 	    origin_name=$OPTARG
@@ -17,6 +17,12 @@ while getopts ":n:m:t:d:c:g:h:f:as" opt; do
             ;;
         d)
             idp_id=$OPTARG
+            ;;
+        i)
+            skip_ssl="true"
+            ;;
+        r)
+            group_mapping_mode="AS_SCOPES"
             ;;
         c)
             config_mapping_file=$OPTARG
@@ -95,8 +101,12 @@ if [[ -z "$nameid_format" ]]; then
     nameid_format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
 fi
 
+if [[ -z "$group_mapping_mode" ]]; then
+    group_mapping_mode="EXPLICITLY_MAPPED"
+fi
+
 left='{"metaDataLocation":"'
-right='","emailDomain":'"$config_email_domain_file"',"idpEntityAlias":"'"$origin_name"'","nameID":"'"$nameid_format"'","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
+right='","emailDomain":'"$config_email_domain_file"',"idpEntityAlias":"'"$origin_name"'","nameID":"'"$nameid_format"'","assertionConsumerIndex":0,"metadataTrustCheck":false,"showSamlLink":true,"socketFactoryClassName":"org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory","linkText":"'"$link_text"'","iconUrl":null,"addShadowUserOnLogin":"'"$add_shadow_user_on_login"'","groupMappingMode":"'"$group_mapping_mode"'","externalGroupsWhitelist":'"$groups_list"',"attributeMappings":'"$config_mapping"'}'
 
 
 
@@ -121,5 +131,8 @@ esc_middle_4=$(echo "$esc_middle_3" | sed 's/"/\\\\\\"/g')
 config="$esc_left$esc_middle_4$esc_right"
 
 data='{"originKey":"'"$origin_name"'","name":"'"$origin_name"'","type":"saml","config":"'"$config"'","active":true}'
-
-uaac curl -XPUT -H"Accept:application/json" -H"Content-Type:application/json" /identity-providers/$idp_id -d "$data"
+if [[ -z $skip_ssl ]]; then
+    uaac curl -XPUT -H"Accept:application/json" -H"Content-Type:application/json" /identity-providers/$idp_id -d "$data"
+else
+    uaac curl -XPUT -H"Accept:application/json" -H"Content-Type:application/json" /identity-providers/$idp_id -d "$data" --insecure
+fi
