@@ -1,7 +1,7 @@
 #!/bin/bash
 set -v -x
 
-while getopts ":n:m:t:d:c:g:h:f:as" opt; do
+while getopts ":n:m:t:d:c:g:h:f:ais" opt; do
     case $opt in
 	n)
 	    origin_name=$OPTARG
@@ -17,6 +17,9 @@ while getopts ":n:m:t:d:c:g:h:f:as" opt; do
             ;;
         d)
             idp_id=$OPTARG
+            ;;
+        i)
+            skip_ssl="true"
             ;;
         c)
             config_mapping_file=$OPTARG
@@ -121,5 +124,8 @@ esc_middle_4=$(echo "$esc_middle_3" | sed 's/"/\\\\\\"/g')
 config="$esc_left$esc_middle_4$esc_right"
 
 data='{"originKey":"'"$origin_name"'","name":"'"$origin_name"'","type":"saml","config":"'"$config"'","active":true}'
-
-uaac curl -XPUT -H"Accept:application/json" -H"Content-Type:application/json" /identity-providers/$idp_id -d "$data"
+if [[ -z $skip_ssl ]]; then
+    uaac curl -XPUT -H"Accept:application/json" -H"Content-Type:application/json" /identity-providers/$idp_id -d "$data"
+else
+    uaac curl -XPUT -H"Accept:application/json" -H"Content-Type:application/json" /identity-providers/$idp_id -d "$data" --insecure
+fi
