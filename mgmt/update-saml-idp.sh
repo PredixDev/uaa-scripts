@@ -114,10 +114,10 @@ esc_left=$(echo $left | sed 's/"/\\"/g')
 esc_right=$(echo $right | sed 's/"/\\"/g')
 
 # dos2unix for stupid OSX that doesn't have dos2unix
-esc_middle_0=$(cat "$saml_metadata_file" | col -b)
+esc_middle_0=$(cat "$saml_metadata_file")
 # formats the xml
 if [[ -z $skip_tidy ]]; then
-    esc_middle_1=$(echo "$esc_middle_0" | tidy -xml -i -)
+    esc_middle_1=$(echo "$esc_middle_0" | tidy -xml -i - | col -b)
 else
     esc_middle_1=$esc_middle_0
 fi
