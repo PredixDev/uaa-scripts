@@ -1,0 +1,347 @@
+# Configuration in this file is overridden by an external file
+# if any of these exist:
+# [$UAA_CONFIG_URL, $UAA_CONFIG_PATH/uaa.yml, $CLOUD_FOUNDRY_CONFIG_PATH/uaa.yml]
+
+name: predix-uaa
+
+#spring_profiles: postgresql,default
+#spring_profiles: hsqldb,default
+
+device:
+  assertion:
+    proxy-public-key: |
+      Not-Used
+
+uaa:
+  host: ${UAA_HOST}
+  port: ${UAA_PORT}
+  path: /
+
+uaa:
+  url: ${UAA_BASEURL}
+
+#database envs
+# database:
+#   driverClassName: org.postgresql.Driver
+#   url: jdbc:postgresql://${DB_PORT_5432_TCP_ADDR}:${DB_PORT_5432_TCP_PORT}/${DB_ENV_DB}
+#   username: ${DB_ENV_USER}
+#   password: ${DB_ENV_PASS}
+
+
+# A comprehensive list of hostnames routed to the UAA default zone. The UAA uses this to resolve subdomains for Identity Zones.
+# Defaults to 'localhost'
+#zones:
+#  internal:
+#    hostnames:
+#      - host1.domain.com
+#      - host2
+#      - testzone3.localhost
+#      - testzone4.localhost
+
+# This property instructs the service to return a 301 redirect with https location for all http requests.
+require_https: false
+
+#authentication:
+#  policy:
+#    lockoutAfterFailures: 5
+#    countFailuresWithinSeconds: 3600
+#    lockoutPeriodSeconds: 600
+
+#TODO client lockout turned off by default while a better solution is being found
+authentication:
+ policy:
+    global:
+     lockoutAfterFailures: 5
+     countFailuresWithinSeconds: 0
+     lockoutPeriodSeconds: 0
+
+# Default token signing key. Each installation MUST provide a unique key
+# in order for tokens to be usable only on that installation.
+jwt:
+  token:
+    claims:
+      exclude:
+        - authorities
+    verification-key: | 
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv9QefUdskKi5BDESZf8E
+      im9thKyzgC4BZV7FeX1uNUZYubdzCj5MRDQEVYCgl42HkjwRh+/Xp6Fo8ZNjv2c5
+      iZ/oSxr/I5F7x1J/d54WzJU3A4/ZRKB2Nb1NozwdRp3IV0phOojwlLTZqfKr1aUn
+      nrEa/gL6qnfm4OUXY3w0iQ9084g+6pi/YzZqU/IsFchi4kh3TCKQfFgu5u+jyWfP
+      q7npvjv31vIIJ7M/psSksDWZYj2PC6YlEDjkC0KUgjuAaUDa3SLVabl1aIvoBuvk
+      vad11SNJUSE7oRbeZHN1d0heRgUHW03TTeK6uYPYF7QQ/d/s7uPeaTX9qgU8fTUY
+      qwIDAQAB
+      -----END PUBLIC KEY-----
+
+    signing-key: | 
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEpAIBAAKCAQEAv9QefUdskKi5BDESZf8Eim9thKyzgC4BZV7FeX1uNUZYubdz
+      Cj5MRDQEVYCgl42HkjwRh+/Xp6Fo8ZNjv2c5iZ/oSxr/I5F7x1J/d54WzJU3A4/Z
+      RKB2Nb1NozwdRp3IV0phOojwlLTZqfKr1aUnnrEa/gL6qnfm4OUXY3w0iQ9084g+
+      6pi/YzZqU/IsFchi4kh3TCKQfFgu5u+jyWfPq7npvjv31vIIJ7M/psSksDWZYj2P
+      C6YlEDjkC0KUgjuAaUDa3SLVabl1aIvoBuvkvad11SNJUSE7oRbeZHN1d0heRgUH
+      W03TTeK6uYPYF7QQ/d/s7uPeaTX9qgU8fTUYqwIDAQABAoIBAQCGGsyV2HDVUJ7H
+      h2bNV1LdVLjDn9h9K6xeKbr0C/QX2m38p3sNFjBLHfJJs/qQ+KhmWwgGeG3TCsxK
+      1jdNf+SBigDjQKRNQU+/MLVb8nEN5OLo4o+JooQBXa4BB+2PiI6eN6lxOnq1+xiP
+      7s6iNStVjYrJOVv0AI6veni3XAV+KtIVoK0SajsuPFgeXMBdCxvvGJR5AC3Qu1Ar
+      3gop2RG788mEwWlyqMTvhAC23iCfeNXvHAaWEAR+8UpaNh1+j3sGRQcCHUvo4q1f
+      OB4uAgxFGXmEeMKXpWes41d9/zXPgwmP6Pgi6/IfOWkn6aFZRE1S6pJDc04Ppgon
+      IrJWpFkBAoGBAOWcQeO2UPgKlPZ51A5gZHDz5GQITVXPO6Ri0152DS/LWtIfKc5z
+      NK3XST9DB/S/iXvnBzZJICbA50FCaqy9xCi3vQbYkdtH8g/EBi/rv0Yty1fk/Eto
+      znvGvL5eiJRkubMejszTrE6VhkHTMKYgs3TjhYbczJukHAxP0IbLNembAoGBANXg
+      OMwC2HFt3bfTkGwl4dxq/aV4u30BuSquw8ZU/WdkQHyNWmhlBgnDHEQYSf0P3Xqj
+      NVTb90AR9Rk4rng2pfTUEXRofh/ejqMYZnF9YU7/78r8QODwdXDasVsniiA90pt+
+      E8w7WVf1C3kGwxLWS3JEgZ3ppoSCBxGvx8QruUYxAoGBAL0qbBpXtQN1bF5X5n3l
+      qjpopOxI7rXYYrG+/ZbgOWL77ZoZNI8y2N6z9FObPO3F81XR814lBskGuj9Ioawp
+      N3e4UJJYUGpRLrsQa2yFk/MUfWevbrAN67eL9yn7phhjl55beZiEd3vSsmZ+wKDN
+      ZivR2stOE3/Sx4zZINo8hvErAoGACOfqVYx0yNxjVClKJUa6jfwijcZmQEFXHZDj
+      dBnL54dELCuSrTAvvS5Tuf4s7o2/kkDDksIKHK/ivecfVMApzvUZuPg08EzLMb1t
+      XqJy7+A2cwRoCzXYHhftNLeDx+3rHDB20JVUFhaNIMAIVXt47swtfY7iMThc5P6l
+      2eRcNbECgYA+ZT8BkbyD9EL5+zEhYqypLVt7E1FXoyxJqZUDwnl86c76LovGp9N1
+      XEfX2vOINHKIt9suh+UBS/Fsp5mn9KemId2dywQEfdhmAChuMjCTFg63aw9eakww
+      cwpMfehFeXKx29E3eFarIrEnvNWved4JX5dXGpsBz6ZsszEMjDTVMw==
+      -----END RSA PRIVATE KEY-----
+
+    policy:
+      global:
+        refreshTokenValiditySeconds: 86400
+
+issuer.uri: ${UAA_BASEURL}
+
+oauth:
+  # Require SSL/TLS for all OAuth calls.
+  authorize:
+    ssl: true
+  clients:
+    admin:
+      id: admin
+      authorities: clients.admin,clients.read,clients.write,clients.secret,scim.read,scim.write,uaa.admin,zones.write,zones.read,sps.read,sps.write
+      authorized-grant-types: client_credentials
+      scope: uaa.none
+      secret: adminsecret
+
+  user:
+    authorities:
+      - openid
+      - scim.me
+      - cloud_controller.read
+      - cloud_controller.write
+      - cloud_controller_service_permissions.read
+      - password.write
+      - scim.userids
+      - uaa.user
+      - approvals.me
+      - oauth.approvals
+      - profile
+      - roles
+      - user_attributes
+      - uaa.offline_token
+scim:
+  #groups: idps.read,idps.write
+  groups:
+    zones.read: Read identity zones
+    zones.write: Create and update identity zones
+    idps.read: Retrieve identity providers
+    idps.write: Create and update identity providers
+    clients.admin: Create, modify and delete OAuth clients
+    clients.write: Create and modify OAuth clients
+    clients.read: Read information about OAuth clients
+    clients.secret: Change the password of an OAuth client
+    scim.write: Create, modify and delete SCIM entities, i.e. users and groups
+    scim.read: Read all SCIM entities, i.e. users and groups
+    scim.create: Create users
+    scim.userids: Read user IDs and retrieve users by ID
+    scim.zones: Control a user's ability to manage a zone
+    scim.invite: Send invitations to users
+    password.write: Change your password
+    oauth.approval: Manage approved scopes
+    oauth.login: Authenticate users outside of the UAA
+    openid: Access profile information, i.e. email, first and last name, and phone number
+    groups.update: Update group information and memberships
+    uaa.user: Act as a user in the UAA
+    uaa.resource: Serve resources protected by the UAA
+    uaa.admin: Act as an administrator throughout the UAA
+    uaa.none: Forbid acting as a user
+    uaa.offline_token: Allow offline access
+  users:
+  - admin|adminsecret|scim.write,scim.read,openid,cloud_controller.admin,clients.read,clients.write
+  userids_enabled: true
+
+# Allow unverified users to log in. Defaults to true
+#allowUnverifiedUsers: false
+
+cors:
+  xhr:
+    allowed:
+      headers:
+        - Accept
+        - Accept-Encoding
+        - Accept-Language
+        - Authorization
+        - Cache-Control
+        - Connection
+        - Content-Type
+        - Cookie
+        - Host
+        - Origin
+        - Referer
+        - User-Agent
+        - X-Requested-With
+      origin:
+        - '^localhost$'
+        - '^.*\.localhost$'
+        - '^.*\.grc-apps.svc.ice.ge.com$'
+      uris:
+        - '^/userinfo$'
+        - '^/login\.do$'
+        - '^/logout\.do$'
+        - '^/saml/.*'
+      methods:
+        - GET
+        - OPTIONS
+        - POST
+
+#Login.yml
+
+# customize static asset source, provides control over visual branding
+# (defaults to /resources/oss)
+assetBaseUrl: /resources/predix
+
+#tiles:
+#  - name: Pivotal Network
+#    login-link: https://network.gopivotal.com/login
+#    image: /resources/pivotal/images/network-logo-gray.png
+#    image-hover: /resources/pivotal/images/network-logo-teal.png
+#  - name: Pivotal Web Services
+#    login-link: https://console.10.244.0.34.xip.io
+#    image: /resources/pivotal/images/pws-logo-gray.png
+#    image-hover: /resources/pivotal/images/pws-logo-teal.png
+#  - name: Pivotal Partners
+#    login-link: https://partners.gopivotal.com/login
+#    image: /resources/pivotal/images/partners-logo-gray.png
+#    image-hover: /resources/pivotal/images/partners-logo-teal.png
+
+links:
+  # Custom self service links (will only be displayed if selfServiceLinksEnabled is true)
+  # If selfServiceLinksEnabled is true and these custom links are not provided then the Login Server
+  # will use internal links.
+  #signup: http://some-oauth-client.example.com/signup
+  #passwd: http://some-other-self-service-server.com/forgot_password
+
+#notifications:
+#  url: http://localhost:3001
+
+logout:
+  redirect:
+    url: /login
+    parameter:
+      disable: false
+
+login:
+  # Enable create account and forgot password links on the Login Server (enabled by default)
+  selfServiceLinksEnabled: true
+  # Enable sending invitations on the Login Server (disabled by default)
+  #invitationsEnabled: true
+  # the brand to use for password reset emails and page titles
+  # (defaults to oss)
+  #brand: pivotal
+  #base URL that the login server can be reached at
+  url: ${UAA_BASEURL}
+
+  # SAML Key Configuration
+  # The location and credentials of the certificate for this SP
+  # See README.md for details on how to create this.
+  serviceProviderKey: | 
+    -----BEGIN RSA PRIVATE KEY-----
+    Proc-Type: 4,ENCRYPTED
+    DEK-Info: DES-EDE3-CBC,1F8CA0CCE03E2E75
+    M53wLUBjT2pd8XuUkMQ18+fTMYMYLeaB8dHzHV8IClIllVSGTJSTJJb6qSQckaas
+    LGMeGr4WJrAl5SwmWWRSrZWP1ZTy0cFfAaX2sAaPhg+qoPaYaweir7B0evCFH3tS
+    5eDlIfZV+iwynN9YZ5nmU3bu97y7gzjfYa/kmI2ldWVFzTuZzonO6XVwjtPFRtc8
+    b4jl/TTuboymOADbM943/EZnIfTTMKUABXL4ERWtH8Td2zwHQaz7Zx700a8atiWT
+    dyoJQobPGUbfsGNqqiJf2Um0ibQnpasFinGW7FMPqA4MsSVvdPY5/nwZ/LEdi24g
+    P8TNTpoC1zKCRaKrdJpKhOCJIjLzFXaNrOdzB/EwhIMQOSRTIFIcGshzDlCeaBuo
+    H9/wI7QKVXrW9klME57266zq6zhRqs/PubTnYD5IE2uLFDNIbmzPGrxpFyOTKqaj
+    IcoifYd3wIRRidDr/ElVy/4aD1nSTYssqia057qXqtfB+OeelxkHBI8sFXI2p0cG
+    qBz5pkn+B5711Vu6EKQrSFK9PKd98JTwIrXSKsybWa7n5b6B7c+xzRzF7PKO1WXp
+    cXI1mgCAMUfS4BgAfZtpS04MoCqKUWswtEh8HYoN3lSTbBeqkTSuZ56d3ylljrfQ
+    8IUgg9w7H79BfDaCRwz/j7YzkXp8ceJia7Wmc+zWlP3qSPU2Ds/Ux7EFT2xXCmqB
+    f27du97K/taaKIpB1S4p0VeBDOODrL3+De1P1YCGCQdSAxTEqBxjVl3ugv6H8gkS
+    bQihdrm4HHFAL+COH8FJq2YnQur+lMmmRtKZNyHzkpztmOHK33ZtDjhlJAuaIjKI
+    /Kv8jW7Sc3maNa/ELFRF5pqffJYO0Ildxwldkdkk4MzS+HfHJJpatDmth+8syjRg
+    0UC+NR6GTxYwCxL7QFdZIbGObmxKCXSKVohDOTc1l1MrnDgOfMj/Q27WMstkcwnu
+    iH37JMyhg2u7zMq2G6xKjseC3I2JG3CCxFc70tmIPF/Mfm2vomuz/CYVyRwTAukw
+    SPS2VfuKJKIEdTUuxapt9dhTI85r7DHU3I+Vu+cT6zeZ9mJSyhVul9kSPhlGBkDk
+    qm5PcCNpMV6Vt0rZ/uP29PbcgEqyJEzjONwAsP1gcl+DLsFcnaxYiRAMMDX/vFeU
+    6KXU2L6zOwFZp6HsbZ1OSAjX6X4AHnLZS3awv/Kyy3zCxbWEEgeEMTEGiSXIQ27+
+    D25+SBxJvc4vXSrVKtYjYll+TspghTbY6cRub9QRjb3/VCBlWXrl7eo5FJU649j+
+    gU9zHFnczwkyXK/OKHmoccw9pRrUREeK+UxG4CV6V+0FQOBtn2s+EgxSK3GblOHT
+    TCt8/OwpzYcn9pE9I2+gsKRkJSl34riyJ4dtBiIy8rBGGNtGeyJWIWGO4QMAx3Ys
+    IV2iDueLHTW9y84ANpScLJBmMDv27PQlxXK6zOJpA5Z8cUD0MjWy41P3tP8Vz9l2
+    OnoytFsUVLpYMz3CuuOz8tjbs4uxl15/us9mcw1qaZXT9wwm5QOzoT7ZwcLwQAgO
+    8kAhvsz0VzfC8gaYZ5v1WO1HlYT/b3bzlAbwTPtMyvs7PjF+sg5RLA==
+    -----END RSA PRIVATE KEY-----
+  serviceProviderKeyPassword: test
+  serviceProviderCertificate: | 
+    -----BEGIN CERTIFICATE-----
+    MIIDZzCCAk+gAwIBAgIJAJrpDKuNTnhZMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNV
+    BAYTAlVTMQswCQYDVQQIDAJDQTESMBAGA1UEBwwJU2FuIFJhbW9uMQswCQYDVQQK
+    DAJHRTETMBEGA1UECwwKR0UgRGlnaXRhbDETMBEGA1UEAwwKcHJlZGl4LXVhYTAe
+    Fw0xNzA4MTcyMjQ5MzVaFw0yNzA4MTUyMjQ5MzVaMGUxCzAJBgNVBAYTAlVTMQsw
+    CQYDVQQIDAJDQTESMBAGA1UEBwwJU2FuIFJhbW9uMQswCQYDVQQKDAJHRTETMBEG
+    A1UECwwKR0UgRGlnaXRhbDETMBEGA1UEAwwKcHJlZGl4LXVhYTCCASIwDQYJKoZI
+    hvcNAQEBBQADggEPADCCAQoCggEBAMxG2obgvPSPKp9dm3uc2vmPq45iPqkuWeM6
+    H1ghRLsBfAkDPzMEn9kDRnQw8c+m1fbAJgQNKLLGqkX87dQhKVufN7L39cW27V2c
+    q2V8PiRHgAh8fauT089h71iISNFULpFTVfqCEIOd3G5pdOQ9rXGLITn1WTxjxZbf
+    5sOKz0ryCPbgtihNKWldsAcR9pNwZvgmKNLgNETnciXFK4ZbBkg+U1ak40C36e1b
+    PggJt0ki36Pr3nnjQRu3WaTxOr5uAoYJW8+9djHlJJzD8h8G9RHXe6vpY66D6F95
+    es0yhcUwlPQ/YC4NoeGW1uIP+VSdYhpI14GOilc69tMoEIRqdYMCAwEAAaMaMBgw
+    CQYDVR0TBAIwADALBgNVHQ8EBAMCBeAwDQYJKoZIhvcNAQELBQADggEBAGwIGoXG
+    nC1A54dsobg+Ls8wmFwHPlCTu27J+SunBrPNPWVwem8hNMSeYwwuAWl2e73USvQB
+    HCg8QYmsCyOc/FyTuOLar8XMZyosmq9EuS+4kNpdxTruZjCLnl1+R8HEVU/XJ/1y
+    o0mpF1S67PF/4JKBpssLpxT5x2h4WrnPsnjAr/ithy/v9pg596YRzEGik1x978Yi
+    6p0N/bDjh4zdYa4MG1WpyqG9J8MJ3ED5TYzOloaeY6LrpVn905RBzXLcGs8OxVH2
+    MTRU7sPaioPTmPESEJcXpiAmTYHoPKU4XnYYq0Si2HgzH1Dl7C71raByKQR4o9G5
+    ARF38n87lIClfyo=
+    -----END CERTIFICATE-----
+  # SAML - The entity base url is the location of this application
+  # (The host and port of the application that will accept assertions)
+  entityBaseURL: ${UAA_BASEURL}
+  # The entityID of this SP
+  entityID: cloudfoundry-saml-login
+  saml:
+    #Local/SP metadata - sign metadata
+    signMetaData: true
+    #Local/SP metadata - requests signed
+    signRequest: true
+    socket:
+      # URL metadata fetch - pool timeout
+      connectionManagerTimeout: 10000
+      # URL metadata fetch - read timeout
+      soTimeout: 10000
+
+  authorize:
+    url: ${UAA_BASEURL}/oauth/authorize
+
+  branding:
+    companyName: Predix
+    footerLegalText:  "Copyright © 2016 General Electric Company. All rights reserved."
+    footerLinks:
+
+uaa:
+  # The hostname of the UAA that this login server will connect to
+  url: ${UAA_BASEURL}
+  token:
+    url: ${UAA_BASEURL}/oauth/token
+  approvals:
+    url: ${UAA_BASEURL}/approvals
+  login:
+    url: ${UAA_BASEURL}/authenticate
+
+# The secret that this login server will use to authenticate to the uaa
+LOGIN_SECRET: loginsecret
+
+# Google Analytics
+#analytics:
+#  code: secret_code
+#  domain: example.com
