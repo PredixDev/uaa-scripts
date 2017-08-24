@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-config=./openssl.cnf
 
 keylen=2048
 
