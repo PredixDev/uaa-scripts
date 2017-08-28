@@ -1,0 +1,23 @@
+version: "2"
+services:
+  uaa:
+    image: repo.jenkins.build.ge.com:9995/guardian/uaa:4.4.0
+    container_name: docker_uaa
+    ports:
+      - "8080:8080"
+    environment:
+      UAA_HOST: localhost
+      UAA_PORT: 8080
+      UAA_BASEURL: http://localhost:8080/uaa
+      #CATALINA_OPTS: "-Dspring.profiles.active=postgresql"
+      #Find a way to copy uaa.yml to docker container
+    volumes: 
+      - ./uaa.yml:/uaa/uaa.yml
+
+  db:
+    image: postgres:9.6.2
+    ports:
+      - "8001:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme
