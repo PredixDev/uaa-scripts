@@ -3,6 +3,8 @@ services:
   uaa:
     image: repo.jenkins.build.ge.com:9995/guardian/uaa:4.4.0
     container_name: docker_uaa
+    #If you need to import a SSL cert into the keystore be sure to mount the volume ./certs:/uaa/certs and comment in the command property.
+    #command: bash -c "keytool -keystore ../../../docker-java-home/jre/lib/security/cacerts -importcert -alias <imported_cert_alias> -file /uaa/certs/<imported_cert_filname> -storepass changeit -noprompt && catalina.sh run"
     ports:
       - "8080:8080"
     environment:
@@ -10,10 +12,9 @@ services:
       UAA_PORT: 8080
       UAA_BASEURL: http://localhost:8080/uaa
       #CATALINA_OPTS: "-Dspring.profiles.active=postgresql"
-      #Find a way to copy uaa.yml to docker container
     volumes: 
       - ./uaa.yml:/uaa/uaa.yml
-
+      #- ./certs:/uaa/certs
   db:
     image: postgres:9.6.2
     ports:
