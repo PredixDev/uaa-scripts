@@ -4,7 +4,7 @@ set -e
 keylen=2048
 
 #openssl genrsa -aes256 -out saml.key -passout pass:$keypass $keylen
-openssl genrsa -out jwt-key-private.pem $keylen
+openssl genrsa -traditional -out jwt-key-private.pem $keylen
 echo "Generated key pair"
 
 openssl rsa -in jwt-key-private.pem -pubout -out jwt-key-public.pem

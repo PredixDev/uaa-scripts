@@ -10,7 +10,7 @@ fi
 config=./openssl.cnf
 days=3650
 keylen=2048
-subj="/C=US/ST=CA/L=San Ramon/O=GE/OU=GE Digital/CN=$1"
+subj="/C=US/ST=CA/L=San Ramon/O=GE Vernova/OU=Electrification Software/CN=$1"
 
 echo -n "Enter a password to protect the private key: "
 read -s keypass
@@ -28,7 +28,7 @@ if [ "$keypass" != "$rekeypass" ]; then
 fi
 
 #openssl genrsa -aes256 -out saml.key -passout pass:$keypass $keylen
-openssl genrsa -des3 -out saml.key -passout pass:$keypass $keylen
+openssl genrsa -des3 -traditional -out saml.key -passout pass:$keypass $keylen
 echo "Generated key"
 
 openssl req -config $config -new -subj "$subj" -key saml.key -passin pass:$keypass -out saml.csr
